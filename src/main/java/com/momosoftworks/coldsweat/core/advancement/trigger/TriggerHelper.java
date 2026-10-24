@@ -1,0 +1,106 @@
+package com.momosoftworks.coldsweat.core.advancement.trigger;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.mojang.datafixers.util.Either;
+import com.mojang.datafixers.util.Pair;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.momosoftworks.coldsweat.api.util.Temperature;
+import com.momosoftworks.coldsweat.config.ConfigSettings;
+import me.shedaniel.autoconfig.AutoConfig;
+
+import java.util.List;
+
+public class TriggerHelper
+{
+    static ConfigSettings configSettings = AutoConfig.getConfigHolder(ConfigSettings.class).getConfig();
+    public static Either<Double, Pair<Double, Double>> getTempValueOrRange(JsonObject entry)
+    {
+        if (entry.has("value"))
+        {
+            double value = entry.get("value").getAsDouble();
+            return Either.left(value);
+        }
+        else
+        {
+            JsonObject range = entry.getAsJsonObject("range");
+            double below = Double.POSITIVE_INFINITY;
+            double above = Double.NEGATIVE_INFINITY;
+
+            if (range != null)
+            {
+                if (range.has("below"))
+                {
+                    try
+                    {   below = range.get("below").getAsDouble();
+                    }
+                    catch (Exception e)
+                    {
+                        String builtinValue = range.get("below").getAsString();
+                        if (builtinValue.equals("max_habitable"))
+                            below = configSettings.MAX_TEMP;
+                        else if (builtinValue.equals("min_habitable"))
+                            below = configSettings.MIN_TEMP;
+                    }
+                }
+
+                if (range.has("above"))
+                {
+                    try
+                    {   above = range.get("above").getAsDouble();
+                    }
+                    catch (Exception e)
+                    {
+                        String builtinValue = range.get("above").getAsString();
+                        if (builtinValue.equals("max_habitable"))
+                            above = configSettings.MAX_TEMP;
+                        else if (builtinValue.equals("min_habitable"))
+                            above = configSettings.MIN_TEMP;
+                    }
+                }
+            }
+
+            return Either.right(new Pair<>(below, above));
+        }
+    }
+
+    public static JsonArray serializeConditions(List<TempCondition> conditions)
+    {
+        JsonArray values = new JsonArray();
+
+        for (TempCondition condition : conditions)
+        {
+            double above = condition.above();
+            double below = condition.below();
+            JsonObject value = new JsonObject();
+            value.addProperty("type", condition.trait().getSerializedName());
+            if (above == below)
+            {   value.addProperty("value", above);
+            }
+            else
+            {   JsonObject range = new JsonObject();
+                range.addProperty("below", below);
+                range.addProperty("above", above);
+                value.add("range", range);
+                values.add(value);
+            }
+        }
+        return values;
+    }
+
+    record TempCondition(Temperature.Trait trait, double below, double above)
+    {
+        public static final Codec<TempCondition> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+                Temperature.Trait.CODEC.fieldOf("trait").forGetter(TempCondition::trait),
+                Codec.DOUBLE.optionalFieldOf("below", Double.MAX_VALUE).forGetter(TempCondition::below),
+                Codec.DOUBLE.optionalFieldOf("above", -Double.MAX_VALUE).forGetter(TempCondition::above)
+        ).apply(instance, TempCondition::new));
+
+        public boolean matches(double value)
+        {   return below > above
+                 ? value >= above && value <= below
+                 : value >= above || value <= below;
+        }
+    }
+}
