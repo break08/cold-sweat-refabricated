@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "cold_sweat",
+  "version": "${version}",
+  "name": "Cold Sweat Refabricated",
+  "description": "arthouse",
+  "authors": [],
+  "contact": {},
+  "license": "GPL-3.0",
+  "icon": "assets/cold_sweat/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "client": [
+      "com.momosoftworks.coldsweat.client.ColdSweatClient"
+    ],
+    "main": [
+      "com.momosoftworks.coldsweat.ColdSweat"
+    ]
+  },
+  "mixins": [
+    "cold_sweat.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric-api": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}
