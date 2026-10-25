@@ -15,6 +15,7 @@ import com.momosoftworks.coldsweat.util.serialization.ConfigHelper;
 import com.momosoftworks.coldsweat.util.serialization.EnumHelper;
 import com.momosoftworks.coldsweat.util.serialization.OptionalHolder;
 import com.momosoftworks.coldsweat.util.world.WorldHelper;
+import me.shedaniel.autoconfig.AutoConfig;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
@@ -29,6 +30,8 @@ import java.util.List;
 
 public class DepthTempData extends ConfigData
 {
+    static ConfigSettings configSettings = AutoConfig.getConfigHolder(ConfigSettings.class).getConfig();
+
     final List<TempRegion> temperatures;
     final NegatableList<Either<TagKey<DimensionType>, OptionalHolder<DimensionType>>> dimensions;
 
@@ -120,22 +123,22 @@ public class DepthTempData extends ConfigData
         {
             // Checks to ensure the region is valid
             // Must have at least one bound
-            if (top == VerticalBound.NONE && bottom == VerticalBound.NONE) throw ColdSweat.LOGGER.throwing(new IllegalArgumentException("Temperature region must have at least one bound"));
+            if (top == VerticalBound.NONE && bottom == VerticalBound.NONE) ColdSweat.LOGGER.error("Temperature region must have at least one bound");
             // Boundless upward
             if (top == VerticalBound.NONE)
             {   // Boundless region must be constant
-                if (type != RampType.CONSTANT) throw ColdSweat.LOGGER.throwing(new IllegalArgumentException("\"top\" region undefined. Boundless temperature region must have a constant temperature"));
+                if (type != RampType.CONSTANT) ColdSweat.LOGGER.error("\"top\" region undefined. Boundless temperature region must have a constant temperature");
                 top = new VerticalBound(VerticalAnchor.CONSTANT, Integer.MAX_VALUE, bottom.units, bottom.temperature);
             }
             // Boundless downward
             if (bottom == VerticalBound.NONE)
             {   // Boundless region must be constant
-                if (type != RampType.CONSTANT) throw ColdSweat.LOGGER.throwing(new IllegalArgumentException("\"bottom\" region undefined. Boundless temperature region must have a constant temperature"));
+                if (type != RampType.CONSTANT) ColdSweat.LOGGER.error("\"bottom\" region undefined. Boundless temperature region must have a constant temperature");
                 bottom = new VerticalBound(VerticalAnchor.CONSTANT, Integer.MIN_VALUE, top.units, top.temperature);
             }
             // Constant temperature ramp type must have a constant temperature
             if (type == RampType.CONSTANT && !top.temperature.equals(bottom.temperature))
-            {   throw ColdSweat.LOGGER.throwing(new IllegalArgumentException("Constant temperature ramp type must have a constant temperature; got " + top.temperature + " and " + bottom.temperature));
+            {   ColdSweat.LOGGER.error("Constant temperature ramp type must have a constant temperature; got " + top.temperature + " and " + bottom.temperature);
             }
 
             // Create the region
@@ -202,7 +205,7 @@ public class DepthTempData extends ConfigData
                 ).apply(instance, (temp, type, strength) ->
                 {
                     if (type == ContainerType.STATIC && temp.equals(Double.NaN) && strength > 0)
-                    {   throw ColdSweat.LOGGER.throwing(new IllegalArgumentException("Static temperature container must have a temperature"));
+                    {   ColdSweat.LOGGER.error("Static temperature container must have a temperature");
                     }
                     return new TempContainer(temp, type, strength);
                 })),
@@ -245,7 +248,7 @@ public class DepthTempData extends ConfigData
                 case MIDPOINT ->
                 {
                     if (this.temperature.strength == 0) yield temperature;
-                    yield CSMath.blend(temperature, CSMath.average(ConfigSettings.MIN_TEMP.get(), ConfigSettings.MAX_TEMP.get()), this.temperature.strength, 0, 1);
+                    yield CSMath.blend(temperature, CSMath.average(configSettings.MIN_TEMP, configSettings.MAX_TEMP), this.temperature.strength, 0, 1);
                 }
             };
         }

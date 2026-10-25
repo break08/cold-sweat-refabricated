@@ -14,14 +14,15 @@ import com.momosoftworks.coldsweat.util.serialization.ConfigHelper;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
 public class EntityClimateData extends ConfigData implements RequirementHolder
 {
+    // why bro use javax instead of jetbrains ?
     final NegatableList<EntityRequirement> entity;
     final double minTemp;
     final double maxTemp;

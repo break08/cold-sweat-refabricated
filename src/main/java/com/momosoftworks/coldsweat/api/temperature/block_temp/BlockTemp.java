@@ -2,17 +2,20 @@ package com.momosoftworks.coldsweat.api.temperature.block_temp;
 
 import com.google.common.collect.ImmutableSet;
 import com.momosoftworks.coldsweat.config.ConfigSettings;
+import me.shedaniel.autoconfig.AutoConfig;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.Set;
 
 public abstract class BlockTemp
 {
+    // make deprecated methods great again !!!
+
     private final Set<Block> validBlocks;
     @Nullable
     private final LegacyProperties legacyProperties;
@@ -32,7 +35,7 @@ public abstract class BlockTemp
     /**
      * DEPRECATED: Override the dynamic property getters (i.e. {@link #getMaxEffect(LivingEntity, Level, BlockPos, BlockState)}) instead
      */
-    @Deprecated(since = "2.4.3", forRemoval = true)
+    @Deprecated(since = "2.4.3")
     public BlockTemp(double minEffect, double maxEffect, double minTemp, double maxTemp, double range, boolean fade, boolean logarithmic, Block... blocks)
     {
         this.validBlocks = ImmutableSet.<Block>builder().add(blocks).build();
@@ -42,7 +45,7 @@ public abstract class BlockTemp
     /**
      * DEPRECATED: Override the dynamic property getters (i.e. {@link #getMaxEffect(LivingEntity, Level, BlockPos, BlockState)}) instead
      */
-    @Deprecated(since = "2.4.3", forRemoval = true)
+    @Deprecated(since = "2.4.3")
     public BlockTemp(double minEffect, double maxEffect, double minTemp, double maxTemp, double range, boolean fade, Block... blocks)
     {   this(minEffect, maxEffect, minTemp, maxTemp, range, fade, false, blocks);
     }
@@ -114,7 +117,7 @@ public abstract class BlockTemp
     /**
      * DEPRECATED: Use {@link #getMaxEffect(LivingEntity, Level, BlockPos, BlockState)} instead
      */
-    @Deprecated(since = "2.4.3", forRemoval = true)
+    @Deprecated(since = "2.4.3")
     public double maxEffect()
     {   return legacyProperties != null ? legacyProperties.maxEffect() : Double.POSITIVE_INFINITY;
     }
@@ -122,7 +125,7 @@ public abstract class BlockTemp
     /**
      * DEPRECATED: Use {@link #getMinEffect(LivingEntity, Level, BlockPos, BlockState)} instead
      */
-    @Deprecated(since = "2.4.3", forRemoval = true)
+    @Deprecated(since = "2.4.3")
     public double minEffect()
     {   return legacyProperties != null ? legacyProperties.minEffect() : Double.NEGATIVE_INFINITY;
     }
@@ -130,7 +133,7 @@ public abstract class BlockTemp
     /**
      * DEPRECATED: Use {@link #getMaxTemp(LivingEntity, Level, BlockPos, BlockState)} instead
      */
-    @Deprecated(since = "2.4.3", forRemoval = true)
+    @Deprecated(since = "2.4.3")
     public double maxTemperature()
     {   return legacyProperties != null ? legacyProperties.maxTemperature() : Double.POSITIVE_INFINITY;
     }
@@ -138,7 +141,7 @@ public abstract class BlockTemp
     /**
      * DEPRECATED: Use {@link #getMinTemp(LivingEntity, Level, BlockPos, BlockState)} instead
      */
-    @Deprecated(since = "2.4.3", forRemoval = true)
+    @Deprecated(since = "2.4.3")
     public double minTemperature()
     {   return legacyProperties != null ? legacyProperties.minTemperature() : Double.NEGATIVE_INFINITY;
     }
@@ -146,7 +149,7 @@ public abstract class BlockTemp
     /**
      * DEPRECATED: Use {@link #isLogarithmic(LivingEntity, Level, BlockPos, BlockState)} instead
      */
-    @Deprecated(since = "2.4.3", forRemoval = true)
+    @Deprecated(since = "2.4.3")
     public boolean logarithmic()
     {   return legacyProperties != null ? legacyProperties.logarithmic() : false;
     }
@@ -154,15 +157,15 @@ public abstract class BlockTemp
     /**
      * DEPRECATED: Use {@link #getRange(LivingEntity, Level, BlockPos, BlockState)} instead
      */
-    @Deprecated(since = "2.4.3", forRemoval = true)
+    @Deprecated(since = "2.4.3")
     public double range()
-    {   return legacyProperties != null ? legacyProperties.range() : ConfigSettings.BLOCK_RANGE.get();
+    {   return legacyProperties != null ? legacyProperties.range() : AutoConfig.getConfigHolder(ConfigSettings.class).getConfig().BLOCK_RANGE;
     }
 
     /**
      * DEPRECATED: Use {@link #fades(LivingEntity, Level, BlockPos, BlockState)} instead
      */
-    @Deprecated(since = "2.4.3", forRemoval = true)
+    @Deprecated(since = "2.4.3")
     public boolean fade()
     {   return legacyProperties != null ? legacyProperties.fade() : true;
     }
@@ -171,6 +174,6 @@ public abstract class BlockTemp
      * Holds the statically-defined properties passed to {@link BlockTemp}'s deprecated constructors.<br>
      * Exists only for backwards compatibility, and will be removed alongside those constructors.
      */
-    @Deprecated(since = "2.4.3", forRemoval = true)
+    @Deprecated(since = "2.4.3")
     record LegacyProperties(double minEffect, double maxEffect, double minTemperature, double maxTemperature, double range, boolean fade, boolean logarithmic) {}
 }

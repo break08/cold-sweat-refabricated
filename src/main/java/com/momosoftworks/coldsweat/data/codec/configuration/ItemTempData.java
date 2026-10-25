@@ -18,8 +18,6 @@ import com.momosoftworks.coldsweat.data.codec.util.ValueGetter;
 import java.util.Map;
 import com.momosoftworks.coldsweat.util.serialization.ConfigHelper;
 import com.momosoftworks.coldsweat.util.serialization.EnumHelper;
-import com.momosoftworks.coldsweat.util.serialization.NBTHelper;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
@@ -28,8 +26,8 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.*;
 
 public class ItemTempData extends ConfigData implements RequirementHolder
